@@ -27,7 +27,6 @@ async def trigger_update(request: UpdateRequest) -> UpdateResponse:
         # Get posts from Reddit
         posts = scraper_singleton.get_posts_since(
             subreddits=request.subreddits,
-            time_window=request.time_window
         )
         logger.info("Fetched %d posts from Reddit", len(posts))
 

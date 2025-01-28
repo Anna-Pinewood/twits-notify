@@ -5,8 +5,6 @@ from pydantic import BaseModel, Field
 class UpdateRequest(BaseModel):
     """Request model for /update endpoint."""
     subreddits: List[str] = Field(..., min_items=1, max_items=10)
-    time_window: Optional[int] = Field(
-        default=24, ge=1, le=168)  # Hours, 1-7 days
 
 
 class UpdateResponse(BaseModel):
