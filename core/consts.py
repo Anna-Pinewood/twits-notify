@@ -7,7 +7,9 @@ PROJECT_PATH = Path(__file__).parent.parent
 ENV_PATH = PROJECT_PATH / ".env"
 config_env = dotenv_values(ENV_PATH)
 
-TWITTER_API_KEY = os.getenv(
-    "TWITTER_API_KEY", config_env.get("TWITTER_API_KEY"))
-TWITTER_API_KEY_SECRET = os.getenv(
-    "TWITTER_API_KEY_SECRET", config_env.get("TWITTER_API_KEY_SECRET"))
+REDDIT_SECRET = os.getenv(
+    "REDDIT_SECRET", config_env.get("REDDIT_SECRET"))
+REDDIT_CLIENT_ID = os.getenv(
+    "REDDIT_CLIENT_ID", config_env.get("REDDIT_CLIENT_ID"))
+REDDIT_APP_NAME = os.getenv(
+    "REDDIT_APP_NAME", config_env.get("REDDIT_APP_NAME"))

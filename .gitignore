@@ -11,3 +11,6 @@ wheels/
 
 # configs
 .env
+
+# notebooks
+notebooks
