@@ -5,13 +5,19 @@ services:
     image: postgres:15
     container_name: db
     environment:
-      POSTGRES_DB: mydb
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d  # Mount init scripts
+      - db_data:/var/lib/postgresql/data       # Persist data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   rabbit:
     image: rabbitmq:3.11-management
@@ -28,9 +34,9 @@ services:
     container_name: api
     environment:
       POSTGRES_HOST: db
-      POSTGRES_DB: mydb
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       RABBIT_HOST: rabbit
     ports:
       - "8000:8000"
@@ -43,9 +49,9 @@ services:
     container_name: consumer
     environment:
       POSTGRES_HOST: db
-      POSTGRES_DB: mydb
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       RABBIT_HOST: rabbit
     depends_on:
       - db
