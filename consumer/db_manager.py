@@ -5,7 +5,7 @@ from typing import Dict, Any
 from datetime import datetime
 import psycopg2
 from psycopg2.extras import Json
-from .consts import POSTGRES_HOST, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD
+from .consts import POSTGRES_HOST, POSTGRES_DB, POSTGRES_PORT, POSTGRES_USER, POSTGRES_PASSWORD
 
 logger = logging.getLogger(__name__)
 
@@ -15,13 +15,23 @@ class DatabaseManager:
     def __init__(
         self,
         host: str = POSTGRES_HOST,
+        port: int = POSTGRES_PORT,
         dbname: str = POSTGRES_DB,
         user: str = POSTGRES_USER,
         password: str = POSTGRES_PASSWORD
     ):
-        """Initialize database connection parameters."""
+        """Initialize database connection parameters.
+        
+        Args:
+            host: Database host address
+            port: Database port number
+            dbname: Database name
+            user: Database user
+            password: Database password
+        """
         self.conn_params = {
             'host': host,
+            'port': port,
             'dbname': dbname,
             'user': user,
             'password': password

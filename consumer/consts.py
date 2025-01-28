@@ -15,7 +15,7 @@ RABBIT_PASSWORD = os.getenv(
     "RABBIT_PASSWORD", config_env.get("RABBIT_PASSWORD"))
 RABBIT_QUEUE = os.getenv(
     "RABBIT_QUEUE", config_env.get("RABBIT_QUEUE"))
-
+RABBIT_PORT = int(os.getenv("RABBIT_PORT", config_env.get("RABBIT_PORT", "5672")))
 
 LLM_MODEL_NAME = os.getenv(
     "LLM_MODEL_NAME", config_env.get("LLM_MODEL_NAME"))
@@ -26,6 +26,7 @@ LLM_BASE_URL = os.getenv(
 
 POSTGRES_HOST = os.getenv(
     "POSTGRES_HOST", config_env.get("POSTGRES_HOST"))
+POSTGRES_PORT = int(os.getenv("POSTGRES_PORT", config_env.get("POSTGRES_PORT", "5432")))
 POSTGRES_DB = os.getenv(
     "POSTGRES_DB", config_env.get("POSTGRES_DB"))
 POSTGRES_USER = os.getenv(

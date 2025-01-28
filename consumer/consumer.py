@@ -8,7 +8,7 @@ from datetime import datetime
 
 from consumer.llm import LLMInterface
 from consumer.prompt import REDDIT_ANALYSIS_PROMPT
-from .consts import RABBIT_HOST, RABBIT_USER, RABBIT_PASSWORD, RABBIT_QUEUE
+from .consts import RABBIT_HOST, RABBIT_PORT, RABBIT_USER, RABBIT_PASSWORD, RABBIT_QUEUE
 from .db_manager import db_manager_singleton
 logger = logging.getLogger(__name__)
 
@@ -33,6 +33,7 @@ class RedditConsumer:
     def __init__(
         self,
         host: str = RABBIT_HOST,
+        port: int = RABBIT_PORT,
         username: str = RABBIT_USER,
         password: str = RABBIT_PASSWORD,
         queue_name: str = RABBIT_QUEUE,
@@ -43,6 +44,7 @@ class RedditConsumer:
 
         Args:
             host: RabbitMQ host address
+            port: RabbitMQ port number
             username: RabbitMQ username
             password: RabbitMQ password
             queue_name: Name of the queue to consume from
@@ -50,27 +52,20 @@ class RedditConsumer:
         """
         self.queue_name = queue_name
         self.host = host
+        self.port = port
         self.credentials = pika.PlainCredentials(username, password)
         self.prefetch_count = prefetch_count
-
-        # Connection state
-        self.connection: Optional[pika.BlockingConnection] = None
-        self.channel: Optional[pika.channel.Channel] = None
-        self._consumer_tag: Optional[str] = None
-        self.should_stop = False
-
-        self.llm = LLMInterface(prompt=REDDIT_ANALYSIS_PROMPT)
 
         # Connection parameters
         self.connection_parameters = pika.ConnectionParameters(
             host=self.host,
+            port=self.port,
             credentials=self.credentials,
-            heartbeat=600,  # 10 minutes heartbeat
+            heartbeat=600,
             blocked_connection_timeout=300,
             connection_attempts=3,
             retry_delay=5
         )
-
     def connect(self) -> None:
         """
         Establish connection to RabbitMQ and set up channel.
