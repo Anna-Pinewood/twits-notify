@@ -7,6 +7,8 @@ import pytz
 import praw
 from tqdm import tqdm
 
+from backend.api.consts import REDDIT_APP_NAME, REDDIT_CLIENT_ID, REDDIT_SECRET
+
 logger = logging.getLogger(__name__)
 
 
@@ -198,3 +200,10 @@ class RedditScraper:
             user_agent=user_agent
         )
         return cls(reddit_client, config)
+
+
+scraper_singleton = RedditScraper.from_credentials(
+    client_id=REDDIT_CLIENT_ID,
+    client_secret=REDDIT_SECRET,
+    user_agent=REDDIT_APP_NAME
+)
