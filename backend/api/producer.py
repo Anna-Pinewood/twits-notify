@@ -5,7 +5,7 @@ import pika
 from typing import Optional
 
 from .reddit import RedditPost
-from .consts import RABBIT_HOST, RABBIT_USER, RABBIT_PASSWORD
+from .consts import RABBIT_HOST, RABBIT_USER, RABBIT_PASSWORD, RABBIT_QUEUE
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ class RedditProducer:
 
     def __init__(self):
         """Initialize producer settings."""
-        self.queue_name = "reddit_posts"
+        self.queue_name = RABBIT_QUEUE
         self.connection = None
         self.channel = None
 
