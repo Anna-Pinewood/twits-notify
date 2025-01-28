@@ -63,8 +63,9 @@ class RedditPost:
         text_with_replaced_links = url_pattern.sub(replacement, text)
         return text_with_replaced_links
 
-    def to_dict(self) -> Dict[str, str|int]:
+    def to_dict(self) -> Dict[str, str | int]:
         return {
+            'post_id': self.post.id,
             'subreddit': self.post.subreddit.display_name,
             'title': self.post.title,
             'author': str(self.post.author),
