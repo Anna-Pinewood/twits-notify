@@ -5,7 +5,7 @@ import pika
 from typing import Optional
 
 from .reddit import RedditPost
-from .consts import RABBIT_HOST, RABBIT_USER, RABBIT_PASSWORD, RABBIT_QUEUE
+from .consts import RABBIT_HOST, RABBIT_PORT, RABBIT_USER, RABBIT_PASSWORD, RABBIT_QUEUE
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +41,7 @@ class RedditProducer:
         parameters = pika.ConnectionParameters(
             host=RABBIT_HOST,
             credentials=credentials,
+            port=RABBIT_PORT,
             heartbeat=600,
             blocked_connection_timeout=300
         )

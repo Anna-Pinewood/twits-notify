@@ -23,4 +23,5 @@ RABBIT_PASSWORD = os.getenv(
     "RABBIT_PASSWORD", config_env.get("RABBIT_PASSWORD"))
 RABBIT_QUEUE = os.getenv(
     "RABBIT_QUEUE", config_env.get("RABBIT_QUEUE"))
-RABBIT_PORT = int(os.getenv("RABBIT_PORT", config_env.get("RABBIT_PORT", "5672")))
+RABBIT_PORT = int(
+    os.getenv("RABBIT_PORT", config_env.get("RABBIT_PORT", "5672")))
