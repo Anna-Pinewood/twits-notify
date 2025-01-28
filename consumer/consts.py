@@ -23,3 +23,12 @@ LLM_API_KEY = os.getenv(
     "LLM_API_KEY", config_env.get("LLM_API_KEY"))
 LLM_BASE_URL = os.getenv(
     "LLM_BASE_URL", config_env.get("LLM_BASE_URL"))
+
+POSTGRES_HOST = os.getenv(
+    "POSTGRES_HOST", config_env.get("POSTGRES_HOST"))
+POSTGRES_DB = os.getenv(
+    "POSTGRES_DB", config_env.get("POSTGRES_DB"))
+POSTGRES_USER = os.getenv(
+    "POSTGRES_USER", config_env.get("POSTGRES_USER"))
+POSTGRES_PASSWORD = os.getenv(
+    "POSTGRES_PASSWORD", config_env.get("POSTGRES_PASSWORD"))

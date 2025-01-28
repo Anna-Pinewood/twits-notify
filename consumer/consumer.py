@@ -5,8 +5,11 @@ import pika
 from typing import Optional, Callable
 import time
 from datetime import datetime
-from .consts import RABBIT_HOST, RABBIT_USER, RABBIT_PASSWORD, RABBIT_QUEUE
 
+from consumer.llm import LLMInterface
+from consumer.prompt import REDDIT_ANALYSIS_PROMPT
+from .consts import RABBIT_HOST, RABBIT_USER, RABBIT_PASSWORD, RABBIT_QUEUE
+from .db_manager import db_manager_singleton
 logger = logging.getLogger(__name__)
 
 
@@ -55,6 +58,8 @@ class RedditConsumer:
         self.channel: Optional[pika.channel.Channel] = None
         self._consumer_tag: Optional[str] = None
         self.should_stop = False
+
+        self.llm = LLMInterface(prompt=REDDIT_ANALYSIS_PROMPT)
 
         # Connection parameters
         self.connection_parameters = pika.ConnectionParameters(
@@ -138,7 +143,13 @@ class RedditConsumer:
             )
 
             # TODO: Add actual processing logic
-            time.sleep(1)  # Simulate processing
+            # time.sleep(1)  # Simulate processing
+            llm_response = self.llm.send_request(
+                call_params={"post_content": message.get("pretty_text")})
+            llm_results = self.llm.get_response_content(llm_response)
+            
+            db_manager_singleton.save_processed_post(
+                post_data=message, llm_results=llm_results)
 
             # Acknowledge message
             ch.basic_ack(delivery_tag=method.delivery_tag)
