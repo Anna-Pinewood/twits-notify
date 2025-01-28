@@ -33,7 +33,7 @@ class RedditPost:
 
     def __init__(self, post: praw.models.Submission):
         self.post = post
-        self.text = self._get_readable_format()
+        self.pretty_text = self._get_readable_format()
 
     def _get_readable_format(self, top_n_comments: int = 5) -> str:
         """Get post content with top comments in a readable format for LLM processing."""
@@ -63,16 +63,17 @@ class RedditPost:
         text_with_replaced_links = url_pattern.sub(replacement, text)
         return text_with_replaced_links
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, str|int]:
         return {
             'subreddit': self.post.subreddit.display_name,
             'title': self.post.title,
             'author': str(self.post.author),
             'score': self.post.score,
             'num_comments': self.post.num_comments,
-            'created_utc': datetime.fromtimestamp(self.post.created_utc, pytz.utc),
+            'created_utc': datetime.fromtimestamp(self.post.created_utc, pytz.utc).strftime('%Y-%m-%d %H:%M:%S'),
             'text': self.post.selftext,
-            'url': self.post.url
+            'url': self.post.url,
+            'pretty_text': self.pretty_text
         }
 
 
