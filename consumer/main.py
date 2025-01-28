@@ -2,8 +2,8 @@
 import logging
 import signal
 import sys
-from .consumer import RedditConsumer
-from .db_manager import db_manager_singleton
+from consumer.consumer_instance import RedditConsumer
+from consumer.db_manager import db_manager_singleton
 
 # Configure logging
 logging.basicConfig(

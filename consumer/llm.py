@@ -17,6 +17,8 @@ class LLMInterface:
         logger.info("Initializing litellm interface")
         self.model_name = model_name
         self.llm_api_key = llm_api_key
+        if llm_base_url == "null":
+            llm_base_url = None
         self.llm_base_url = llm_base_url
         self.prompt = prompt
 
@@ -62,6 +64,9 @@ class LLMInterface:
     def get_response_content(response: litellm.ModelResponse) -> str | dict:
         try:
             result = response['choices'][0]['message']['content']
+            if "```json" in result:
+                result = result.split("```json")[1]
+                result = result.split("```")[0]
             return json.loads(result)
         except json.JSONDecodeError:
             return result
