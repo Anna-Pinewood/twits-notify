@@ -64,6 +64,8 @@ jobs:
         echo "REDDIT_SECRET=dummy" >> .env
         echo "REDDIT_CLIENT_ID=dummy" >> .env
         echo "REDDIT_APP_NAME=dummy" >> .env
+        echo "RABBIT_QUEUE=reddit_posts" >> .env
+        export $(cat .env | xargs)
         
     - name: Start services
       run: docker compose up -d
@@ -71,9 +73,9 @@ jobs:
     - name: Wait for services to be ready
       run: |
         # Wait for PostgreSQL
-        timeout 100s bash -c 'until docker compose exec -T db pg_isready -U testuser; do sleep 1; done'
+        timeout 100s bash -c 'until docker compose exec -T db pg_isready -U testuser -d testdb; do sleep 1; done'
         
-        # Wait for API small
+        # Wait for API
         timeout 100s bash -c 'until curl -s http://localhost:8000/health | grep -q "healthy"; do sleep 1; done'
         
     - name: Verify database setup
