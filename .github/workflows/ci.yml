@@ -62,7 +62,7 @@ jobs:
         # Wait for PostgreSQL
         timeout 100s bash -c 'until docker compose exec -T db pg_isready -U testuser; do sleep 1; done'
         
-        # Wait for API
+        # Wait for API small
         timeout 100s bash -c 'until curl -s http://localhost:8000/health | grep -q "healthy"; do sleep 1; done'
         
     - name: Verify database setup
