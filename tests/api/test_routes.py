@@ -24,3 +24,15 @@ def test_update_handler():
         data = response.json()
         assert data["status"] == "queued"
         assert "job_id" in data
+
+def test_get_summary():
+    with patch("backend.api.routes.db_manager_singleton.get_latest_processing_date") as mock_latest, \
+         patch("backend.api.routes.db_manager_singleton.get_subreddit_stats") as mock_stats, \
+         patch("backend.api.routes.db_manager_singleton.get_posts_by_date") as mock_posts:
+        mock_latest.return_value = None
+        response = client.get("/summary")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total_processed"] == 0
+        assert data["subreddit_stats"] == {}
+        assert data["latest_update"] == ""
