@@ -28,8 +28,10 @@ jobs:
         
     - name: Run tests
       run: |
-        echo "PYTHONPATH=$PYTHONPATH:${{ github.workspace }}/backend/consumer:${{ github.workspace }}/backend/api" >> $GITHUB_ENV
+        echo "Running unit tests"
         pytest tests/
+      env:
+        PYTHONPATH: ${{ github.workspace }}
 
   integration:
     name: Integration Tests
