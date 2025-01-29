@@ -6,10 +6,10 @@ from typing import Optional, Callable
 import time
 from datetime import datetime
 
-from consumer.llm import LLMInterface
-from consumer.prompt import REDDIT_ANALYSIS_PROMPT
-from consumer.consts import RABBIT_HOST, RABBIT_PORT, RABBIT_USER, RABBIT_PASSWORD, RABBIT_QUEUE
-from consumer.db_manager import db_manager_singleton
+from llm import LLMInterface
+from prompt import REDDIT_ANALYSIS_PROMPT
+from consts import RABBIT_HOST, RABBIT_PORT, RABBIT_USER, RABBIT_PASSWORD, RABBIT_QUEUE
+from db_manager import db_manager_singleton
 logger = logging.getLogger(__name__)
 
 

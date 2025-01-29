@@ -7,7 +7,7 @@ import pytz
 import praw
 from tqdm import tqdm
 
-from backend.api.consts import REDDIT_APP_NAME, REDDIT_CLIENT_ID, REDDIT_SECRET
+from consts import REDDIT_APP_NAME, REDDIT_CLIENT_ID, REDDIT_SECRET
 
 logger = logging.getLogger(__name__)
 

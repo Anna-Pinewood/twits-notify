@@ -1,20 +1,48 @@
-import logging
-from fastapi import FastAPI
-from .routes import router
+"""Main FastAPI application with metrics middleware."""
+import time
+import os
+from fastapi import FastAPI, Request
+from starlette.middleware.base import BaseHTTPMiddleware
+from routes import router
+from metrics import metrics_endpoint, REQUESTS_TOTAL, REQUEST_DURATION
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-
-# Create FastAPI app
 app = FastAPI(title="Reddit Analysis Service")
 
-# Include routes
+
+class MetricsMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Start timer
+        start_time = time.time()
+
+        # Get endpoint path for metrics
+        endpoint = request.url.path
+
+        # Update requests counter
+        REQUESTS_TOTAL.labels(
+            endpoint=endpoint,
+            method=request.method
+        ).inc()
+
+        # Process request
+        response = await call_next(request)
+
+        # Record request duration
+        duration = time.time() - start_time
+        REQUEST_DURATION.labels(
+            endpoint=endpoint
+        ).observe(duration)
+
+        return response
+
+
+# Add metrics middleware
+app.add_middleware(MetricsMiddleware)
+
+# Add routes
 app.include_router(router)
 
-# Add health check endpoint
+# Add metrics endpoint
+app.add_route("/metrics", metrics_endpoint)
 
 
 @app.get("/health")

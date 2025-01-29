@@ -4,8 +4,8 @@ import logging
 import pika
 from typing import Optional
 
-from .reddit import RedditPost
-from .consts import RABBIT_HOST, RABBIT_PORT, RABBIT_USER, RABBIT_PASSWORD, RABBIT_QUEUE
+from reddit import RedditPost
+from consts import RABBIT_HOST, RABBIT_PORT, RABBIT_USER, RABBIT_PASSWORD, RABBIT_QUEUE
 
 logger = logging.getLogger(__name__)
 

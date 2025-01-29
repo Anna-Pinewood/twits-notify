@@ -5,7 +5,7 @@ from typing import List, Dict, Any, Optional, Tuple
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
-from .consts import (
+from consts import (
     POSTGRES_HOST,
     POSTGRES_DB,
     POSTGRES_PORT,
