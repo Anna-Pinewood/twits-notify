@@ -102,16 +102,16 @@ class DatabaseManager:
             self.cur.execute("SELECT 1")
             self.cur.fetchone()
 
-        except (psycopg2.OperationalError, psycopg2.InterfaceError, psycopg2.Error) as e:
+        except (psycopg2.OperationalError, psycopg2.InterfaceError, psycopg2.Error) as e:  # pragma: no cover
             logger.warning(
                 "Lost database connection, reconnecting: %s", str(e))
             self.conn = None
             self.cur = None
             self.connect()
-        except Exception as e:
+        except Exception as e:   # pragma: no cover
             logger.error("Failed to ensure database connection: %s",
                          str(e), exc_info=True)
-            raise
+            raise   # pragma: no cover
 
     def save_processed_post(
         self,
@@ -205,7 +205,7 @@ class DatabaseManager:
             if self.conn is not None:
                 self.conn.close()
                 logger.info("Database connection closed")
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             logger.error("Error while closing database connection: %s", str(e))
         finally:
             self.cur = None

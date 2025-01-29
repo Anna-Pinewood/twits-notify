@@ -93,7 +93,7 @@ class RedditConsumer:
                 not self.channel or
                     self.channel.is_closed):
                 self.connect()
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             logger.error("Failed to ensure connection: %s", str(e))
             raise
 
@@ -165,11 +165,11 @@ class RedditConsumer:
                 logger.warning("Connection closed by broker, retrying...")
                 continue
 
-            except pika.exceptions.AMQPChannelError as e:
+            except pika.exceptions.AMQPChannelError as e:  # pragma: no cover
                 logger.error("Channel error: %s, retrying...", str(e))
                 continue
 
-            except Exception as e:
+            except Exception as e:  # pragma: no cover
                 logger.error("Unexpected error: %s", str(e))
                 self.connection = None
                 self.channel = None

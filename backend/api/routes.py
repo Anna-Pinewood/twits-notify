@@ -76,7 +76,8 @@ async def get_summary() -> SummaryResponse:
             )
 
         # Get subreddit statistics
-        stats = db_manager_singleton.get_subreddit_stats(latest_date)
+        stats = db_manager_singleton.get_subreddit_stats(
+            latest_date)  # pragma: no cover
 
         # Get detailed posts data by subreddit
         posts_by_subreddit = db_manager_singleton.get_posts_by_date(

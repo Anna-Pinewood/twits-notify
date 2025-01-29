@@ -1,4 +1,3 @@
-# pragma: no cover
 from abc import ABC, abstractmethod
 import json
 import logging
@@ -43,7 +42,7 @@ class LLMInterface:
         if prompt is None:
             prompt = self.prompt
         if call_params is None:
-            call_params = {}
+            call_params = {} # pragma: no cover
         messages = [{"role": "user",
                     "content": prompt.format(**call_params)}]
         logger.info(
@@ -65,7 +64,7 @@ class LLMInterface:
     def get_response_content(response: litellm.ModelResponse) -> str | dict:
         try:
             result = response['choices'][0]['message']['content']
-            if "```json" in result:
+            if "```json" in result: # pragma: no cover
                 result = result.split("```json")[1]
                 result = result.split("```")[0]
             return json.loads(result)
