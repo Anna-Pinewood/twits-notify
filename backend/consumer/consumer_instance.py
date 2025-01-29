@@ -119,7 +119,6 @@ class RedditConsumer:
                 message.get('subreddit', '')
             )
 
-            # TODO: Add actual processing logic
             # time.sleep(1)  # Simulate processing
             llm_response = self.llm.send_request(
                 call_params={"post_content": message.get("pretty_text")})
