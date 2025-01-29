@@ -1,28 +1,34 @@
 """Prometheus metrics configuration for the API service."""
-from prometheus_client import Counter, Histogram, Gauge
+from prometheus_client import Counter, Histogram, Gauge, CollectorRegistry
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from fastapi import Response
 import pika
 from typing import Optional
 from consts import RABBIT_HOST, RABBIT_USER, RABBIT_PASSWORD
 
-# Define metrics
+# Create a custom registry
+REGISTRY = CollectorRegistry()
+
+# Define metrics with custom registry
 REQUESTS_TOTAL = Counter(
     'reddit_api_requests_total',
     'Total number of API requests',
-    ['endpoint', 'method']
+    ['endpoint', 'method'],
+    registry=REGISTRY
 )
 
 REQUEST_DURATION = Histogram(
     'reddit_api_request_duration_seconds',
     'Request duration in seconds',
     ['endpoint'],
-    buckets=[0.1, 0.5, 1.0, 2.0, 5.0]
+    buckets=[0.1, 0.5, 1.0, 2.0, 5.0],
+    registry=REGISTRY
 )
 
 QUEUE_SIZE = Gauge(
     'reddit_queue_size',
-    'Number of messages in RabbitMQ queue'
+    'Number of messages in RabbitMQ queue',
+    registry=REGISTRY
 )
 
 
@@ -54,7 +60,7 @@ def get_queue_size() -> Optional[int]:
         return None
 
 
-async def metrics_endpoint(request):  # Changed to accept request parameter
+async def metrics_endpoint(request):
     """Endpoint for exposing metrics to Prometheus."""
     # Update queue size before generating metrics
     queue_size = get_queue_size()
@@ -62,6 +68,6 @@ async def metrics_endpoint(request):  # Changed to accept request parameter
         QUEUE_SIZE.set(queue_size)
 
     return Response(
-        generate_latest(),
+        generate_latest(REGISTRY),
         media_type=CONTENT_TYPE_LATEST
     )

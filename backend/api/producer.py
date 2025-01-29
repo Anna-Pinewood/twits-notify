@@ -104,8 +104,8 @@ class RedditProducer:
         """Close RabbitMQ connection."""
         if self.connection and not self.connection.is_closed:
             self.connection.close()
-            self.connection = None
-            self.channel = None
+        self.connection = None
+        self.channel = None
 
 
 # Create singleton instance
