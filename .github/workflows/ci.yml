@@ -26,7 +26,7 @@ jobs:
         pip install -r backend/consumer/requirements.txt
         pip install pytest
         
-      - name: Create temporary .env file
+    - name: Create temporary .env file
       run: |
         cp .env.example .env
         cat .env
