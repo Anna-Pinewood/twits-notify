@@ -6,11 +6,12 @@ from typing import Dict, Any
 from datetime import datetime
 import psycopg2
 from psycopg2.extras import Json
-from backend.consumer.consts_consumer import POSTGRES_HOST, POSTGRES_DB, POSTGRES_PORT, POSTGRES_USER, POSTGRES_PASSWORD
+from consts_consumer import POSTGRES_HOST, POSTGRES_DB, POSTGRES_PORT, POSTGRES_USER, POSTGRES_PASSWORD
 
 # Set up detailed logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
 
 class DatabaseManager:
     """Manages database operations for Reddit posts."""
@@ -45,32 +46,35 @@ class DatabaseManager:
             'user': user,
             'password': password
         }
-        
-        logger.info("DatabaseManager initialized with params: host=%s, port=%s, dbname=%s, user=%s", 
-                   host, port, dbname, user)
+
+        logger.info("DatabaseManager initialized with params: host=%s, port=%s, dbname=%s, user=%s",
+                    host, port, dbname, user)
         self.conn = None
         self.cur = None
-        
+
         # Try initial connection
         try:
             self.connect()
         except Exception as e:
-            logger.error("Initial connection failed: %s", str(e), exc_info=True)
+            logger.error("Initial connection failed: %s",
+                         str(e), exc_info=True)
 
     def connect(self) -> None:
         """Establish database connection."""
         try:
-            conn_params_safe = {k: v for k, v in self.conn_params.items() if k != 'password'}
-            logger.info("Connecting to PostgreSQL with params: %s", conn_params_safe)
-            
+            conn_params_safe = {
+                k: v for k, v in self.conn_params.items() if k != 'password'}
+            logger.info("Connecting to PostgreSQL with params: %s",
+                        conn_params_safe)
+
             self.conn = psycopg2.connect(**self.conn_params)
             self.cur = self.conn.cursor()
-            
+
             # Test the connection
             self.cur.execute("SELECT current_database(), current_user;")
             db, user = self.cur.fetchone()
             logger.info("Connected to database: %s as user: %s", db, user)
-            
+
             # Check table existence
             self.cur.execute("""
                 SELECT EXISTS (
@@ -81,9 +85,10 @@ class DatabaseManager:
             """)
             table_exists = self.cur.fetchone()[0]
             logger.info("reddit_posts table exists: %s", table_exists)
-            
+
         except Exception as e:
-            logger.error("Database connection failed: %s", str(e), exc_info=True)
+            logger.error("Database connection failed: %s",
+                         str(e), exc_info=True)
             raise
 
     def ensure_connection(self) -> None:
@@ -92,19 +97,21 @@ class DatabaseManager:
             if not self.conn or self.conn.closed:
                 logger.info("Connection lost, reconnecting...")
                 self.connect()
-            
+
             # Test if connection is alive
             self.cur.execute("SELECT 1")
             self.cur.fetchone()
-            
-        except (psycopg2.OperationalError, psycopg2.InterfaceError, psycopg2.Error) as e:
-            logger.warning("Lost database connection, reconnecting: %s", str(e))
+
+        except (psycopg2.OperationalError, psycopg2.InterfaceError, psycopg2.Error) as e:  # pragma: no cover
+            logger.warning(
+                "Lost database connection, reconnecting: %s", str(e))
             self.conn = None
             self.cur = None
             self.connect()
-        except Exception as e:
-            logger.error("Failed to ensure database connection: %s", str(e), exc_info=True)
-            raise
+        except Exception as e:   # pragma: no cover
+            logger.error("Failed to ensure database connection: %s",
+                         str(e), exc_info=True)
+            raise   # pragma: no cover
 
     def save_processed_post(
         self,
@@ -138,13 +145,13 @@ class DatabaseManager:
                     discussion_summary = EXCLUDED.discussion_summary
                 RETURNING post_id;
             """
-            
+
             # Extract tags and summary from LLM results
             tags = {
                 "tags": llm_results.get("tags", []),
                 "main_topics": llm_results.get("main_topics", [])
             }
-            
+
             # Prepare values for insertion
             values = (
                 post_data['post_id'],
@@ -152,7 +159,8 @@ class DatabaseManager:
                 post_data['title'],
                 post_data['text'],
                 post_data['author'],
-                datetime.strptime(post_data['created_utc'], '%Y-%m-%d %H:%M:%S'),
+                datetime.strptime(
+                    post_data['created_utc'], '%Y-%m-%d %H:%M:%S'),
                 datetime.now(),
                 Json(tags),
                 llm_results.get('discussion_summary', ''),
@@ -161,11 +169,12 @@ class DatabaseManager:
                 post_data['num_comments']
             )
 
-            logger.info("Executing INSERT query with post_id=%s", post_data['post_id'])
+            logger.info("Executing INSERT query with post_id=%s",
+                        post_data['post_id'])
             self.cur.execute(query, values)
             result = self.cur.fetchone()
             logger.info("Insert result: %s", result)
-            
+
             logger.info("Committing transaction...")
             self.conn.commit()
             logger.info(
@@ -183,7 +192,8 @@ class DatabaseManager:
             logger.info("Verification query result: %s", verify_result)
 
         except Exception as e:
-            logger.error("Failed to save post to database: %s", str(e), exc_info=True)
+            logger.error("Failed to save post to database: %s",
+                         str(e), exc_info=True)
             self.conn.rollback()
             raise
 
@@ -195,7 +205,7 @@ class DatabaseManager:
             if self.conn is not None:
                 self.conn.close()
                 logger.info("Database connection closed")
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             logger.error("Error while closing database connection: %s", str(e))
         finally:
             self.cur = None

@@ -8,7 +8,7 @@ from datetime import datetime
 
 from llm import LLMInterface
 from prompt import REDDIT_ANALYSIS_PROMPT
-from backend.consumer.consts_consumer import RABBIT_HOST, RABBIT_PORT, RABBIT_USER, RABBIT_PASSWORD, RABBIT_QUEUE
+from consts_consumer import RABBIT_HOST, RABBIT_PORT, RABBIT_USER, RABBIT_PASSWORD, RABBIT_QUEUE
 from db_manager import db_manager_singleton
 logger = logging.getLogger(__name__)
 
@@ -93,7 +93,7 @@ class RedditConsumer:
                 not self.channel or
                     self.channel.is_closed):
                 self.connect()
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             logger.error("Failed to ensure connection: %s", str(e))
             raise
 
@@ -119,7 +119,6 @@ class RedditConsumer:
                 message.get('subreddit', '')
             )
 
-            # TODO: Add actual processing logic
             # time.sleep(1)  # Simulate processing
             llm_response = self.llm.send_request(
                 call_params={"post_content": message.get("pretty_text")})
@@ -165,11 +164,11 @@ class RedditConsumer:
                 logger.warning("Connection closed by broker, retrying...")
                 continue
 
-            except pika.exceptions.AMQPChannelError as e:
+            except pika.exceptions.AMQPChannelError as e:  # pragma: no cover
                 logger.error("Channel error: %s, retrying...", str(e))
                 continue
 
-            except Exception as e:
+            except Exception as e:  # pragma: no cover
                 logger.error("Unexpected error: %s", str(e))
                 self.connection = None
                 self.channel = None

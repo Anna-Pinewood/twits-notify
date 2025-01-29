@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [ main, master ]
   push:
-    branches: [ main, master ]
+    branches: [ main, master, actions ]
 
 jobs:
   test:
@@ -26,8 +26,19 @@ jobs:
         pip install -r backend/consumer/requirements.txt
         pip install pytest
         
+    - name: Create temporary .env file
+      run: |
+        cp .env.example .env
+        cat .env
+
     - name: Run tests
-      run: pytest tests/
+      run: |
+        echo "Running unit tests"
+        export $(cat .env | xargs) 
+        echo $REDDIT_SECRET
+        PYTHONPATH=$PYTHONPATH:${{ github.workspace }}/backend/api:${{ github.workspace }}/backend/consumer pytest tests/
+      env:
+        PYTHONPATH: ${{ github.workspace }}
 
   integration:
     name: Integration Tests
@@ -53,6 +64,8 @@ jobs:
         echo "REDDIT_SECRET=dummy" >> .env
         echo "REDDIT_CLIENT_ID=dummy" >> .env
         echo "REDDIT_APP_NAME=dummy" >> .env
+        echo "RABBIT_QUEUE=reddit_posts" >> .env
+        export $(cat .env | xargs)
         
     - name: Start services
       run: docker compose up -d
@@ -60,7 +73,7 @@ jobs:
     - name: Wait for services to be ready
       run: |
         # Wait for PostgreSQL
-        timeout 100s bash -c 'until docker compose exec -T db pg_isready -U testuser; do sleep 1; done'
+        timeout 100s bash -c 'until docker compose exec -T db pg_isready -U testuser -d testdb; do sleep 1; done'
         
         # Wait for API
         timeout 100s bash -c 'until curl -s http://localhost:8000/health | grep -q "healthy"; do sleep 1; done'

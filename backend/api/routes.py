@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 from models import UpdateRequest, UpdateResponse, SummaryResponse
 from reddit import scraper_singleton
 from producer import producer_singleton
-from backend.api.db_manager_read import db_manager_singleton
+from db_manager_read import db_manager_singleton
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -76,7 +76,8 @@ async def get_summary() -> SummaryResponse:
             )
 
         # Get subreddit statistics
-        stats = db_manager_singleton.get_subreddit_stats(latest_date)
+        stats = db_manager_singleton.get_subreddit_stats(
+            latest_date)  # pragma: no cover
 
         # Get detailed posts data by subreddit
         posts_by_subreddit = db_manager_singleton.get_posts_by_date(

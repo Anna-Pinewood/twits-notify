@@ -180,9 +180,9 @@ class RedditScraper:
     @classmethod
     def from_credentials(
         cls,
-        client_id: str,
-        client_secret: str,
-        user_agent: str,
+        client_id: str = REDDIT_CLIENT_ID,
+        client_secret: str = REDDIT_SECRET,
+        user_agent: str = REDDIT_APP_NAME,
         config: Optional[RedditPostConfig] = None
     ) -> 'RedditScraper':
         """Create RedditScraper instance from credentials.
@@ -203,7 +203,8 @@ class RedditScraper:
         )
         return cls(reddit_client, config)
 
-
+print(REDDIT_CLIENT_ID)
+print(f"{REDDIT_SECRET=}")
 scraper_singleton = RedditScraper.from_credentials(
     client_id=REDDIT_CLIENT_ID,
     client_secret=REDDIT_SECRET,
