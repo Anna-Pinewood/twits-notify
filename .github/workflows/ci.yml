@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [ main, master ]
   push:
-    branches: [ main, master ]
+    branches: [ main, master, actions ]
 
 jobs:
   test:
@@ -29,7 +29,7 @@ jobs:
     - name: Run tests
       run: |
         echo "Running unit tests"
-        pytest tests/
+        PYTHONPATH=$PYTHONPATH:${{ github.workspace }}/backend/api:${{ github.workspace }}/backend/consumer pytest tests/
       env:
         PYTHONPATH: ${{ github.workspace }}
 
