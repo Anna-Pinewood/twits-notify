@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 from models import UpdateRequest, UpdateResponse, SummaryResponse
 from reddit import scraper_singleton
 from producer import producer_singleton
-from backend.api.db_manager_read import db_manager_singleton
+from db_manager_read import db_manager_singleton
 
 # Configure logging
 logger = logging.getLogger(__name__)

@@ -8,7 +8,7 @@ from datetime import datetime
 
 from llm import LLMInterface
 from prompt import REDDIT_ANALYSIS_PROMPT
-from backend.consumer.consts_consumer import RABBIT_HOST, RABBIT_PORT, RABBIT_USER, RABBIT_PASSWORD, RABBIT_QUEUE
+from consts_consumer import RABBIT_HOST, RABBIT_PORT, RABBIT_USER, RABBIT_PASSWORD, RABBIT_QUEUE
 from db_manager import db_manager_singleton
 logger = logging.getLogger(__name__)
 
