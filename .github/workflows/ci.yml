@@ -27,7 +27,9 @@ jobs:
         pip install pytest
         
     - name: Run tests
-      run: pytest tests/
+      run: |
+        echo "PYTHONPATH=$PYTHONPATH:${{ github.workspace }}/backend/consumer:${{ github.workspace }}/backend/api" >> $GITHUB_ENV
+        pytest tests/
 
   integration:
     name: Integration Tests
