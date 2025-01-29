@@ -8,7 +8,7 @@ from backend.api.models import UpdateRequest
 
 client = TestClient(app)
 
-def test_health_check(client):
+def test_health_check():
     """Test health check endpoint."""
     response = client.get("/health")
     assert response.status_code == 200
