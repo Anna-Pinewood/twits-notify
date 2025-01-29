@@ -35,7 +35,7 @@ class RedditProducer:
     def _init_connection(self) -> None:
         """Set up RabbitMQ connection with credentials."""
         if self.connection and not self.connection.is_closed:
-            self.connection.close()
+            self.connection.close() #
 
         credentials = pika.PlainCredentials(RABBIT_USER, RABBIT_PASSWORD)
         parameters = pika.ConnectionParameters(

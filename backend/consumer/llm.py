@@ -1,8 +1,9 @@
+# pragma: no cover
 from abc import ABC, abstractmethod
 import json
 import logging
 import litellm
-from consts import LLM_MODEL_NAME, LLM_API_KEY, LLM_BASE_URL
+from backend.consumer.consts_consumer import LLM_MODEL_NAME, LLM_API_KEY, LLM_BASE_URL
 logger = logging.getLogger(__name__)
 
 

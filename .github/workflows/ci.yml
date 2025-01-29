@@ -1,0 +1,78 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r backend/api/requirements.txt
+        pip install -r backend/consumer/requirements.txt
+        pip install pytest
+        
+    - name: Run tests
+      run: pytest tests/
+
+  integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Create env file
+      run: |
+        echo "POSTGRES_DB=testdb" >> .env
+        echo "POSTGRES_USER=testuser" >> .env
+        echo "POSTGRES_PASSWORD=testpass" >> .env
+        echo "POSTGRES_PORT=5432" >> .env
+        echo "RABBIT_USER=guest" >> .env
+        echo "RABBIT_PASSWORD=guest" >> .env
+        echo "RABBIT_PORT=5672" >> .env
+        echo "RABBIT_UI_PORT=15672" >> .env
+        echo "API_PORT=8000" >> .env
+        echo "PROMETHEUS_PORT=9090" >> .env
+        echo "GRAFANA_PORT=3000" >> .env
+        echo "REDDIT_SECRET=dummy" >> .env
+        echo "REDDIT_CLIENT_ID=dummy" >> .env
+        echo "REDDIT_APP_NAME=dummy" >> .env
+        
+    - name: Start services
+      run: docker compose up -d
+      
+    - name: Wait for services to be ready
+      run: |
+        # Wait for PostgreSQL
+        timeout 100s bash -c 'until docker compose exec -T db pg_isready -U testuser; do sleep 1; done'
+        
+        # Wait for API
+        timeout 100s bash -c 'until curl -s http://localhost:8000/health | grep -q "healthy"; do sleep 1; done'
+        
+    - name: Verify database setup
+      run: |
+        docker compose exec -T db psql -U testuser -d testdb -c "\dt reddit_posts"
+        
+    - name: Show service logs if any step failed
+      if: failure()
+      run: docker compose logs
+      
+    - name: Cleanup
+      if: always()
+      run: docker compose down -v

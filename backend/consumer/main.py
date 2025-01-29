@@ -4,7 +4,7 @@ import sys
 import os
 from consumer_instance import RedditConsumer
 from db_manager import DatabaseManager
-from consts import (
+from backend.consumer.consts_consumer import (
     POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB,
     POSTGRES_USER, POSTGRES_PASSWORD
 )

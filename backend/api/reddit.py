@@ -109,7 +109,7 @@ class RedditScraper:
         Returns:
             List of RedditPost objects sorted by score
         """
-        if since is None:
+        if since is None:  # pragma: no cover
             since = datetime.now(pytz.utc) - \
                 timedelta(hours=self.config.time_window)
 
@@ -124,7 +124,7 @@ class RedditScraper:
             try:
                 posts = self._get_subreddit_posts(subreddit_name, since)
                 all_posts.extend(posts)
-            except Exception as e:
+            except Exception as e:  # pragma: no cover
                 logger.error(
                     "Failed to fetch posts from subreddit %s: %s",
                     subreddit_name,

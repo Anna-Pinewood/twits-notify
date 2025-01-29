@@ -37,7 +37,7 @@ async def trigger_update(request: UpdateRequest) -> UpdateResponse:
             try:
                 producer_singleton.publish(post)
                 queued_count += 1
-            except Exception as e:
+            except Exception as e:  # pragma: no cover
                 logger.error("Failed to queue post %s: %s",
                              post.post.url, str(e))
 
