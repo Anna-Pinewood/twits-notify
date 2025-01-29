@@ -116,6 +116,16 @@ class TestDatabaseManager:
             mock_cursor.execute.assert_called_once()
             assert result == test_date
 
+    def test_get_latest_processing_date_error(self, db_manager, mock_connection, mock_cursor):
+        """Test error handling in get_latest_processing_date."""
+        mock_cursor.execute.side_effect = psycopg2.Error("DB query failed")
+
+        with patch('psycopg2.connect', return_value=mock_connection):
+            db_manager.connect()
+            with pytest.raises(psycopg2.Error) as exc_info:
+                db_manager.get_latest_processing_date()
+            assert str(exc_info.value) == "DB query failed"
+
     def test_get_posts_by_date(self, db_manager, mock_connection, mock_cursor, sample_db_response):
         """Test retrieving posts for a specific date."""
         mock_cursor.fetchall.return_value = [sample_db_response]
@@ -153,6 +163,17 @@ class TestDatabaseManager:
             assert stats['total_posts'] == 100
             assert len(stats['subreddits']) == 5
 
+    def test_get_subreddit_stats_error(self, db_manager, mock_connection, mock_cursor):
+        """Test error handling in get_subreddit_stats."""
+        test_date = datetime(2024, 1, 1)
+        mock_cursor.execute.side_effect = psycopg2.Error("Stats query failed")
+
+        with patch('psycopg2.connect', return_value=mock_connection):
+            db_manager.connect()
+            with pytest.raises(psycopg2.Error) as exc_info:
+                db_manager.get_subreddit_stats(test_date)
+            assert str(exc_info.value) == "Stats query failed"
+
     def test_close(self, db_manager, mock_connection, mock_cursor):
         """Test database connection closure."""
         with patch('psycopg2.connect', return_value=mock_connection):
@@ -162,15 +183,55 @@ class TestDatabaseManager:
             mock_cursor.close.assert_called_once()
             mock_connection.close.assert_called_once()
 
-    def test_error_handling(self, db_manager, mock_connection, mock_cursor):
-        """Test error handling in database operations."""
-        mock_cursor.execute.side_effect = psycopg2.Error("Database error")
+    def test_connection_closed_error(self, db_manager, mock_connection):
+        """Test handling of closed connection errors."""
+        # First set up initial connection
+        with patch('psycopg2.connect', return_value=mock_connection):
+            db_manager.connect()
+
+            # Now make the connection appear closed
+            db_manager.conn.closed = True
+
+            # Mock connect to raise error on reconnection attempt
+            with patch('psycopg2.connect', side_effect=psycopg2.OperationalError("Connection lost")):
+                with pytest.raises(Exception):
+                    db_manager.ensure_connection()
+
+    def test_cursor_execution_error(self, db_manager, mock_connection, mock_cursor):
+        """Test SQL execution errors."""
+        mock_cursor.execute.side_effect = psycopg2.Error("SQL syntax error")
         test_date = datetime(2024, 1, 1)
 
         with patch('psycopg2.connect', return_value=mock_connection):
             db_manager.connect()
-            with pytest.raises(psycopg2.Error, match="Database error"):
+            with pytest.raises(psycopg2.Error, match="SQL syntax error"):
                 db_manager.get_posts_by_date(test_date)
+
+    def test_connection_timeout_error(self, db_manager):
+        """Test database connection timeout."""
+        with patch('psycopg2.connect', side_effect=psycopg2.OperationalError("Connection timed out")):
+            with pytest.raises(psycopg2.OperationalError, match="Connection timed out"):
+                db_manager.connect()
+
+    def test_cursor_fetch_error(self, db_manager, mock_connection, mock_cursor):
+        """Test fetch operation errors."""
+        mock_cursor.fetchall.side_effect = psycopg2.DatabaseError(
+            "Result set error")
+        test_date = datetime(2024, 1, 1)
+
+        with patch('psycopg2.connect', return_value=mock_connection):
+            db_manager.connect()
+            with pytest.raises(psycopg2.DatabaseError, match="Result set error"):
+                db_manager.get_posts_by_date(test_date)
+
+    def test_null_result_handling(self, db_manager, mock_connection, mock_cursor):
+        """Test handling of null results."""
+        mock_cursor.fetchone.return_value = None
+
+        with patch('psycopg2.connect', return_value=mock_connection):
+            db_manager.connect()
+            result = db_manager.get_latest_processing_date()
+            assert result is None
 
 
 def test_db_manager_singleton():
